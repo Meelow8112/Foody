@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>List of dishes</title>
+  <th:block th:replace="layout :: link-css"></th:block>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+  <h4 class="text-center">Sản Phẩm <br /><a class="nav-link" href=/products/add>Add</a></h4>
+  <table class="table">
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Description</th>
+      <th>Image</th>
+      <th>Price</th>
+      <th>Category</th>
+      <th>Action</th>
+    </tr>
+    <tr th:each="product : ${products}">
+      <td th:text="${product.id}"></td>
+      <td th:text="${product.title}"></td>
+      <td th:text="${product.author}"></td>
+      <td th:text="${product.description}"></td>
+      <td> <img height="120" th:src="@{/images/} + ${product.image}" width="150"/></td>
+      <td th:text="${product.price}"></td>
+      <td th:text="${product.category.name}"></td><td>
+      <a th:href="@{/products/edit/{id} (id=${product.id})}">Edit</a> |
+      <a th:href="@{/products/delete/{id} (id=${product.id})}"
+         onclick="return confirm ('Are you sure?')">Delete</a>
+    </td>
+
+    </tr>
+  </table>
+</div>
+
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>

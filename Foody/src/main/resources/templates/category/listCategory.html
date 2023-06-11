@@ -7,24 +7,130 @@
 </head>
 <body>
 <th:block th:replace="layout :: header"></th:block>
-<h4 class="text-center">Loại sản phẩm<br /><a class="nav-link" href=/categories/add>Add</a></h4>
-<div class="container">
-  <table class="table">
-    <tr>
-      <th>ID</th>
-      <th>Title</th>
-    </tr>
-    <tr th:each="category : ${categories}">
-      <td th:text="${category.id}"></td>
-      <td th:text="${category.name}"></td>
-      <td>
-      <a th:href="@{/categories/edit/{id} (id=${category.id})}">Edit</a> |
-      <a th:href="@{/categories/delete/{id} (id=${category.id})}"
-         onclick="return confirm ('Are you sure?')">Delete</a>
-      </td>
-    </tr>
-  </table>
+
+
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>List of dishes</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Admin  - Dashboard</title>
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link
+          href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+  <link href="css/sb-admin-2.min.css" rel="stylesheet">
+  <th:block th:replace="layout :: link-css"></th:block>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+
+<div id="wrapper">
+  <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+      <div class="sidebar-brand-icon rotate-n-15">
+        <i class="fas fa-laugh-wink"></i>
+      </div>
+      <div class="sidebar-brand-text mx-3">Admin</div>
+    </a>
+    <hr class="sidebar-divider my-0">
+    <li class="nav-item active">
+      <a class="nav-link" href="/products">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Product</span></a>
+    </li>
+    <hr class="sidebar-divider my-0">
+    <li class="nav-item active">
+      <a class="nav-link" href="/categories">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Category</span></a>
+    </li>
+    <hr class="sidebar-divider my-0">
+  </ul>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+          <i class="fa fa-bars"></i>
+        </button>
+        <form
+                class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+          <div class="input-group">
+            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                   aria-label="Search" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="button">
+                <i class="fas fa-search fa-sm"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown no-arrow d-sm-none">
+            <a class="nav-link dropdown-toggle"  href="#" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-search fa-fw"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                 aria-labelledby="searchDropdown">
+              <form th:action="@{/products/search}" class="form-inline mr-auto w-100 navbar-search">
+                <input type="text" name="keyword" id="keyword" size="50" th:value="${keyword}" required />
+                <input type="submit" value="Search" />
+              </form>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <!--            <div class="container">-->
+      <h4 class="text-center">Loại sản phẩm<br /><a class="nav-link" href=/categories/add>Add</a></h4>
+        <table class="table">
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+          </tr>
+          <tr th:each="category : ${categories}">
+            <td th:text="${category.id}"></td>
+            <td th:text="${category.name}"></td>
+            <td>
+              <a th:href="@{/categories/edit/{id} (id=${category.id})}">Edit</a> |
+              <a th:href="@{/categories/delete/{id} (id=${category.id})}"
+                 onclick="return confirm ('Are you sure?')">Delete</a>
+            </td>
+          </tr>
+        </table>
+      <!--            </div>-->
+    </div>
+  </div>
 </div>
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="login.html">Logout</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 
 <th:block th:replace="layout :: footer"></th:block>
 </body>

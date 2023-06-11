@@ -1,26 +1,26 @@
 package com.example.foody.controller;
 
+import com.example.foody.entity.Item;
 import com.example.foody.entity.Product;
+import com.example.foody.services.CartService;
+import com.example.foody.services.CategoryService;
+import com.example.foody.services.ProductService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import com.example.foody.services.ProductService;
-import com.example.foody.services.CategoryService;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.UUID;
-
 @Controller
 @RequestMapping("/products")
 public class ProductController {
@@ -30,38 +30,33 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private CartService cartService;
     @GetMapping
-    public String showAllBooks(Model model) {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
+    public String showAllProducts(Model model, @RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "5") int size) {
+        Page<Product> products = productService.getAllProducts(page, size);
+        model.addAttribute("products", products.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", products.getTotalPages());
         return "product/list";
     }
+
     @GetMapping("/add")
-    public String addProductForm(Product b, Model model){
+    public String addProductForm(Product p,Model model){
         model.addAttribute("categories",categoryService.getAllCategories());
         return "product/add";
     }
 
     @PostMapping("/add")
-    public String addProduct(@Valid Product product, @RequestParam MultipartFile imageProduct, BindingResult result, Model model){
+    public String addProduct(@Valid @ModelAttribute("product") Product product, BindingResult result, Model model){
         model.addAttribute("categories",categoryService.getAllCategories());
         if(result.hasErrors()){
-            model.addAttribute("product",product);
             return "product/add";
         }
-        if(imageProduct != null && imageProduct.getSize() > 0) {
-            try {
-                File saveFile = new ClassPathResource("static/images").getFile();
-                String newImageFile = UUID.randomUUID() + ".png";
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + newImageFile);
-                Files.copy(imageProduct.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                product.setImage(newImageFile);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        model.addAttribute("product",new Product());
         productService.addProduct(product);
-        return "redirect:/products";
+        return "redirect:/books";
     }
     @GetMapping("/edit/{id}")
     public String editProductForm(@PathVariable("id") Long id, Model model) {
@@ -74,9 +69,37 @@ public class ProductController {
             return "not-found";
         }
     }
+    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
+    @PostMapping("/upload") public String uploadImage(Model model, @RequestParam("image") MultipartFile file) throws IOException {
+        StringBuilder fileNames = new StringBuilder();
+        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
+        fileNames.append(file.getOriginalFilename());
+        Files.write(fileNameAndPath, file.getBytes());
+        model.addAttribute("msg", "Uploaded images: " + fileNames.toString());
+        return "redirect:/products";
+    }
+    @GetMapping("/search")
+    public String searchProduct(Model model, @Param("keyword") String keyword,
+                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "5") int size) {
+        Page<Product> productPage = productService.searchProducts(keyword, page, size);
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        return "product/search";
+    }
 
+//    @GetMapping("/search")
+//    public String searchBook(Model model, @Param("keyword") String keyword){
+//        var item = bookService.getAllBooks().stream().filter(m->m.getAuthor().toUpperCase().contains(keyword.toUpperCase())
+//                || m.getTitle().toUpperCase().contains(keyword.toUpperCase()));
+//        model.addAttribute("books",item);
+//        model.addAttribute("keyword", keyword);
+//        return "book/search";
+//    }
     @PostMapping("/edit")
-    public String editProduct(@ModelAttribute("book") Product product) {
+    public String editProduct(@ModelAttribute("product") Product product) {
         productService.updateProduct(product);
         return "redirect:/products";
     }
@@ -87,4 +110,17 @@ public class ProductController {
         productService.deleteProduct(id);
         return "redirect:/products";
     }
+    @PostMapping("/add-to-cart")
+    public String addToCart(HttpSession session,
+                            @RequestParam long id,
+                            @RequestParam String title,
+                            @RequestParam double price,
+                            @RequestParam(defaultValue = "1") int quantity)
+    {
+        var cart = cartService.getCart(session);
+        cart.addItems(new Item(id, title, price, quantity));
+        cartService.updateCart(session, cart);
+        return "redirect:/products";
+    }
+
 }
