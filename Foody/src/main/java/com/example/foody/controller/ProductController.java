@@ -30,8 +30,7 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private CartService cartService;
+
     @GetMapping
     public String showAllProducts(Model model, @RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "5") int size) {
@@ -52,32 +51,15 @@ public class ProductController {
     public String addProduct(@Valid @ModelAttribute("product") Product product, BindingResult result, Model model){
         model.addAttribute("categories",categoryService.getAllCategories());
         if(result.hasErrors()){
+
             return "product/add";
         }
         model.addAttribute("product",new Product());
         productService.addProduct(product);
-        return "redirect:/books";
-    }
-    @GetMapping("/edit/{id}")
-    public String editProductForm(@PathVariable("id") Long id, Model model) {
-        Product editProduct = productService.getProductById(id);
-        model.addAttribute("categories", categoryService.getAllCategories());
-        if (editProduct != null) {
-            model.addAttribute("product", editProduct);
-            return "product/edit";
-        } else {
-            return "not-found";
-        }
-    }
-    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
-    @PostMapping("/upload") public String uploadImage(Model model, @RequestParam("image") MultipartFile file) throws IOException {
-        StringBuilder fileNames = new StringBuilder();
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
-        fileNames.append(file.getOriginalFilename());
-        Files.write(fileNameAndPath, file.getBytes());
-        model.addAttribute("msg", "Uploaded images: " + fileNames.toString());
         return "redirect:/products";
     }
+
+
     @GetMapping("/search")
     public String searchProduct(Model model, @Param("keyword") String keyword,
                              @RequestParam(defaultValue = "0") int page,
@@ -89,37 +71,35 @@ public class ProductController {
         model.addAttribute("totalPages", productPage.getTotalPages());
         return "product/search";
     }
-
-//    @GetMapping("/search")
-//    public String searchBook(Model model, @Param("keyword") String keyword){
-//        var item = bookService.getAllBooks().stream().filter(m->m.getAuthor().toUpperCase().contains(keyword.toUpperCase())
-//                || m.getTitle().toUpperCase().contains(keyword.toUpperCase()));
-//        model.addAttribute("books",item);
-//        model.addAttribute("keyword", keyword);
-//        return "book/search";
-//    }
     @PostMapping("/edit")
     public String editProduct(@ModelAttribute("product") Product product) {
         productService.updateProduct(product);
         return "redirect:/products";
     }
-
+    @GetMapping("/edit/{id}")
+    public String editProductForm(@PathVariable("id") Long id, Model model) {
+        Product editProduct = productService.getProductById(id);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        if (editProduct != null) {
+            model.addAttribute("product", editProduct);
+            return "product/edit";
+        } else {
+            return "error/404";
+        }
+    }
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Long id) {
         Product product = productService.getProductById(id);
         productService.deleteProduct(id);
         return "redirect:/products";
     }
-    @PostMapping("/add-to-cart")
-    public String addToCart(HttpSession session,
-                            @RequestParam long id,
-                            @RequestParam String title,
-                            @RequestParam double price,
-                            @RequestParam(defaultValue = "1") int quantity)
-    {
-        var cart = cartService.getCart(session);
-        cart.addItems(new Item(id, title, price, quantity));
-        cartService.updateCart(session, cart);
+    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
+    @PostMapping("/upload") public String uploadImage(Model model, @RequestParam("image") MultipartFile file) throws IOException {
+        StringBuilder fileNames = new StringBuilder();
+        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
+        fileNames.append(file.getOriginalFilename());
+        Files.write(fileNameAndPath, file.getBytes());
+        model.addAttribute("msg", "Uploaded images: " + fileNames.toString());
         return "redirect:/products";
     }
 

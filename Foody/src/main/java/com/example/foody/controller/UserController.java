@@ -12,7 +12,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.core.Authentication;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -20,9 +22,18 @@ public class UserController {
     @Autowired
     private UserService userService;
     @GetMapping("/login")
-    public String login() {
-        return "user/login";
+    public String login( Authentication authentication) {
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Check if the user has the "ADMIN" role
+            if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                return "redirect:/products"; // Redirect to the product view for admins
+            } else {
+                return "redirect:/"; // Redirect to the home view for users
+            }
+        }return "user/login";
     }
+
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("user", new User());
