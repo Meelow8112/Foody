@@ -38,12 +38,15 @@ public class SecurityConfig {
             Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/", "/register", "/error")
+                        .requestMatchers("/css/**", "/js/**","/scss/**","/vendor/**", "/", "/register", "/error","/images/**")
                         .permitAll()
-                        .requestMatchers("/books/edit", "/books/delete")
+                        .requestMatchers("/products/edit/**", "/products/delete/**")
                         .hasAnyAuthority("ADMIN")
-                        .requestMatchers("/books","books/add")
+                        .requestMatchers("/products","products/add")
                         .hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers("/") // Add this line
+                        .hasAnyAuthority("USER") // Restrict access to users with the "USER" role
+
                         .anyRequest().authenticated()
 
                 )
@@ -56,6 +59,7 @@ public class SecurityConfig {
 
                 )
                 .formLogin(formLogin -> formLogin.loginPage("/login")
+                        .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
                         .permitAll()

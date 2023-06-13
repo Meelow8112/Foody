@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>List of dishes</title>
@@ -16,7 +16,7 @@
     <th:block th:replace="layout :: link-css"></th:block>
 </head>
 <body>
-<th:block th:replace="layout :: header"></th:block>
+<!--<th:block th:replace="layout :: header"></th:block>-->
 
 <div id="wrapper">
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -47,16 +47,20 @@
                 </button>
                 <form
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                    <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                               aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group" th:action="@{/products/search}">
+                        <input type="text" name="keyword"
+                               id="keyword" size="50"
+                               th:value="${keyword}">
+<!--                               class="form-control bg-light border-0 small" placeholder="Search for..."-->
+<!--                               aria-label="Search" aria-describedby="basic-addon2">-->
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
+                            <button class="btn btn-primary" type="submit" value="Search">
                                 <i class="fas fa-search fa-sm"></i>
                             </button>
                         </div>
                     </div>
                 </form>
+
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown no-arrow d-sm-none">
                         <a class="nav-link dropdown-toggle"  href="#" role="button"
@@ -65,9 +69,20 @@
                         </a>
                     </li>
                 </ul>
+                <div>
+
+                    <div sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post">
+                            <button class="btn btn btn-danger" type="submit">Logout</button>
+                        </form>
+                    </div>
+                    <div sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary" href="/login">Login</a>
+                    </div>
+                </div>
             </nav>
 
-<!--            <div class="container">-->
+            <div class="container">
                 <h4 class="text-center">Sản Phẩm <br /><a class="nav-link" href=/products/add>Add</a></h4>
                 <table class="table">
                     <tr class="text-lg-left">
@@ -77,6 +92,7 @@
                         <th>Description</th>
                         <th>Image</th>
                         <th>Price</th>
+                        <th>Quantity</th>
                         <th>Category</th>
                         <th>Action</th>
                     </tr>
@@ -87,24 +103,16 @@
                         <td th:text="${product.description}"></td>
                         <td> <img height="120" th:src="@{/images/} + ${product.image}" width="150"/></td>
                         <td th:text="${product.price}"></td>
+                        <td th:text="${product.quantity}"></td>
                         <td th:text="${product.category.name}"></td><td>
-                        <a th:href="@{/products/edit/{id} (id=${product.id})}">Edit</a> |
-                        <a th:href="@{/products/delete/{id} (id=${product.id})}"
+                        <a class="btn btn-primary" th:href="@{/products/edit/{id} (id=${product.id})}">Edit</a> |
+                        <a class="btn btn-danger" th:href="@{/products/delete/{id} (id=${product.id})}"
                            onclick="return confirm ('Are you sure?')">Delete</a>
-                        <form th:action="@{/products/add-to-cart}" method="post" class="d-inline">
-                            <input type="hidden" name="id" th:value="${product.getId()}">
-                            <input type="hidden" name="title"th:value="${product.getTitle()}">
-                            <input type="hidden" name="price"
-                                   th:value="${product.getPrice()}">
-                            <button type="submit" class="btn btn-success"
-                                    onclick="return confirm('Are you sure you want to add this book to cart?')">
-                                Add to cart</button>
-                        </form>
                     </td>
 
                     </tr>
                 </table>
-<!--            </div>-->
+            </div>
         </div>
         <div class="pagination ">
             <ul class="pagination text-center align-items-center">
@@ -129,6 +137,6 @@
 
 
 
-<th:block th:replace="layout :: footer"></th:block>
+<!--<th:block th:replace="layout :: footer"></th:block>-->
 </body>
 </html>
