@@ -62,8 +62,8 @@ public class ProductController {
 
     @GetMapping("/search")
     public String searchProduct(Model model, @Param("keyword") String keyword,
-                             @RequestParam(defaultValue = "0") int page,
-                             @RequestParam(defaultValue = "5") int size) {
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size) {
         Page<Product> productPage = productService.searchProducts(keyword, page, size);
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("keyword", keyword);
@@ -99,7 +99,7 @@ public class ProductController {
         Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
         fileNames.append(file.getOriginalFilename());
         Files.write(fileNameAndPath, file.getBytes());
-        model.addAttribute("msg", "Uploaded images: " + fileNames.toString());
+        model.addAttribute("images", "Uploaded images: " + fileNames.toString());
         return "redirect:/products";
     }
 

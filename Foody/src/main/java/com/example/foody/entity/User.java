@@ -45,4 +45,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
+
+    @Column(name = "provider", length = 50)
+    private String provider;
+
 }

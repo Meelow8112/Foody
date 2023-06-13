@@ -1,6 +1,9 @@
 package com.example.foody.utils;
 
 import com.example.foody.services.CustomUserDetailService;
+import com.example.foody.services.OAuthService;
+import com.example.foody.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao. DaoAuthenticationProvider;
@@ -11,10 +14,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails. UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password. PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 @Configuration
-@EnableWebSecurity @EnableMethodSecurity
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final OAuthService oAuthService;
+    private final UserService userService;
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailService();
@@ -42,8 +50,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/products/edit/**", "/products/delete/**")
                         .hasAnyAuthority("ADMIN")
-                        .requestMatchers("/products","products/add")
-                        .hasAnyAuthority("ADMIN","USER")
+                        .requestMatchers("/admin","/products","products/add")
+                        .hasAnyAuthority("ADMIN")
                         .requestMatchers("/") // Add this line
                         .hasAnyAuthority("USER") // Restrict access to users with the "USER" role
 
@@ -62,8 +70,26 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
+                        .failureUrl("/login?error=true")
                         .permitAll()
 
+                ).oauth2Login(
+                        oauth2Login -> oauth2Login.loginPage("/login")
+                                .failureUrl("/login?error")
+                                .userInfoEndpoint(userInfoEndpoint ->
+                                        userInfoEndpoint
+                                                .userService(oAuthService)
+                                )
+                                .successHandler(
+                                        (request, response,
+                                         authentication) -> {
+                                            var oidcUser =
+                                                    (DefaultOidcUser) authentication.getPrincipal();
+                                            userService.saveOauthUser(oidcUser.getEmail(), oidcUser.getName());
+                                            response.sendRedirect("/");
+                                        }
+                                )
+                                .permitAll()
                 )
                 .rememberMe(rememberMe -> rememberMe.key("uniqueAndSecret")
                         .tokenValiditySeconds(86400)
@@ -71,6 +97,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.accessDeniedPage("/403"))
+
                 .build();
     }
 }

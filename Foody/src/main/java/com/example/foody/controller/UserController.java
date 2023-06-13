@@ -25,11 +25,10 @@ public class UserController {
     public String login( Authentication authentication) {
 
         if (authentication != null && authentication.isAuthenticated()) {
-            // Check if the user has the "ADMIN" role
             if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                return "redirect:/products"; // Redirect to the product view for admins
+                return "redirect:/products";
             } else {
-                return "redirect:/"; // Redirect to the home view for users
+                return "redirect:/";
             }
         }return "user/login";
     }
