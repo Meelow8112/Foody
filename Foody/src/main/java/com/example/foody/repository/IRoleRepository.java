@@ -24,4 +24,5 @@ public interface IRoleRepository extends JpaRepository<Role, Long> {
     @Query (value = "SELECT г.name FROM role r INNER JOIN user_role ur " +
             "ON r.id = ur.role_id WHERE ur.user_id = ?1", nativeQuery = true)
     String[] getRolesOfUser (Long userId);
+    Role findRoleById(Long Id);
 }
