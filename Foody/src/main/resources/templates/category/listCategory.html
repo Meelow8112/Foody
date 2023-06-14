@@ -1,20 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>List of dishes</title>
-  <th:block th:replace="layout :: link-css"></th:block>
-</head>
-<body>
-<th:block th:replace="layout :: header"></th:block>
-
-
-<th:block th:replace="layout :: footer"></th:block>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
   <title>List of dishes</title>
@@ -31,7 +16,6 @@
   <th:block th:replace="layout :: link-css"></th:block>
 </head>
 <body>
-<th:block th:replace="layout :: header"></th:block>
 
 <div id="wrapper">
   <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -61,33 +45,24 @@
         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
           <i class="fa fa-bars"></i>
         </button>
-        <form
-                class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-          <div class="input-group">
-            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                   aria-label="Search" aria-describedby="basic-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-primary" type="button">
-                <i class="fas fa-search fa-sm"></i>
-              </button>
-            </div>
-          </div>
-        </form>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown no-arrow d-sm-none">
             <a class="nav-link dropdown-toggle"  href="#" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fas fa-search fa-fw"></i>
             </a>
-            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                 aria-labelledby="searchDropdown">
-              <form th:action="@{/products/search}" class="form-inline mr-auto w-100 navbar-search">
-                <input type="text" name="keyword" id="keyword" size="50" th:value="${keyword}" required />
-                <input type="submit" value="Search" />
-              </form>
-            </div>
           </li>
         </ul>
+        <div class="px-3">
+          <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="post">
+              <button class="btn btn btn-danger" type="submit">Logout</button>
+            </form>
+          </div>
+          <div sec:authorize="!isAuthenticated()">
+            <a class="btn btn-primary" href="/login">Login</a>
+          </div>
+        </div>
       </nav>
 
       <!--            <div class="container">-->
@@ -101,8 +76,8 @@
             <td th:text="${category.id}"></td>
             <td th:text="${category.name}"></td>
             <td>
-              <a th:href="@{/categories/edit/{id} (id=${category.id})}">Edit</a> |
-              <a th:href="@{/categories/delete/{id} (id=${category.id})}"
+              <a class="btn btn-primary"  th:href="@{/categories/edit/{id} (id=${category.id})}">Edit</a> |
+              <a class="btn btn-danger"  th:href="@{/categories/delete/{id} (id=${category.id})}"
                  onclick="return confirm ('Are you sure?')">Delete</a>
             </td>
           </tr>
@@ -132,6 +107,5 @@
 </div>
 
 
-<th:block th:replace="layout :: footer"></th:block>
 </body>
 </html>

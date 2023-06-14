@@ -6,7 +6,6 @@
   <title>Edit Book</title>
 </head>
 <body>
-<th:block th:replace="layout :: header"></th:block>
 <div class="container">
   <h1>Edit Book</h1>
   <form th:action="@{/categories/edit}" th:object="${category}" method="post">
@@ -20,6 +19,5 @@
   <br>
   <a th:href="@{/products}">Back to List</a>
 </div>
-<th:block th:replace="layout :: footer"></th:block>
 </body>
 </html>

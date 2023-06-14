@@ -6,8 +6,11 @@ import com.example.foody.validator.annotation.ValidUserId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -55,6 +58,9 @@ public class Product {
     @NotNull(message = "Quantity is required")
     private int quantity;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<ItemInvoice> itemInvoices = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

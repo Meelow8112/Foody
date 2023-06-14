@@ -6,7 +6,6 @@
   <title>Add dishes</title>
 </head>
 <body>
-<th:block th:replace="layout :: header"></th:block>
 <div class="container">
   <h1>Add category</h1>
   <form th:action="@{/categories/add}" th:object="${category}" method="post">
@@ -21,6 +20,5 @@
   <br>
   <a th:href="@{/categories}">Back to List</a>
 </div>
-<th:block th:replace="layout :: footer"></th:block>
 </body>
 </html>

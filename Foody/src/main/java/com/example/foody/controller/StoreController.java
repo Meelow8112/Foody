@@ -32,6 +32,10 @@ public class StoreController {
         model.addAttribute("totalPages", products.getTotalPages());
         return "store/index";
     }
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        return "redirect:/email";
+    }
     @GetMapping("/search")
     public String searchProduct(Model model, @Param("keyword") String keyword,
                                 @RequestParam(defaultValue = "0") int page,
