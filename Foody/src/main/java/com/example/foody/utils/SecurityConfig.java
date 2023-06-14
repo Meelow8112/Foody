@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin","/products","products/add")
                         .hasAnyAuthority("ADMIN")
                         .requestMatchers("/") // Add this line
-                        .hasAnyAuthority("USER") // Restrict access to users with the "USER" role
+                        .hasAnyAuthority("USER")
 
                         .anyRequest().authenticated()
 
