@@ -46,8 +46,8 @@
                     <i class="fa fa-bars"></i>
                 </button>
                 <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                    <div class="input-group" th:action="@{/products/search}">
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" th:action="@{/products/search}">
+                    <div class="input-group" >
                         <input type="text" name="keyword"
                                id="keyword" size="50"
                                th:value="${keyword}">
