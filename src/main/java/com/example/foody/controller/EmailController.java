@@ -47,7 +47,7 @@ public class EmailController {
             emailService.sendHtmlEmail(email);
             return "store/email-success";
         } catch (Exception e) {
-            logger.error("html email cant sent html", e);
+            logger.error("lỗi không thể gửi mail!", e);
             return "error/404";
         }
     }
